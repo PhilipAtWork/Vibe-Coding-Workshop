@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Values Survey – Synthetic Data Explorer</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:#222;background:#fafafa;margin:0;padding:0;line-height:1.6}
+.container{max-width:900px;margin:0 auto;padding:1rem 1.25rem 3rem}
+h1{font-size:1.75rem;margin:1.5rem 0 0.25rem}
+h2{font-size:1.25rem;margin:2.5rem 0 0.5rem;border-bottom:2px solid #ddd;padding-bottom:0.3rem}
+p{margin:0.5rem 0}
+a{color:#0072B2}
+.intro{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:1rem 1.25rem;margin:1rem 0}
+.summary-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:0.9rem}
+.summary-table th,.summary-table td{padding:0.4rem 0.75rem;border:1px solid #ddd;text-align:left}
+.summary-table th{background:#f5f5f5;font-weight:600}
+.summary-table code{background:#eef;padding:0.1rem 0.3rem;border-radius:3px;font-size:0.85em}
+.note{font-size:0.9rem;color:#555;margin:0.5rem 0}
+.chart-wrap{position:relative;width:100%;max-width:720px;margin:1.5rem auto}
+canvas{width:100%!important}
+.takeaway{background:#f0f7ff;border-left:3px solid #0072B2;padding:0.6rem 1rem;margin:1rem 0;font-size:0.95rem;border-radius:0 6px 6px 0}
+/* Heatmap */
+.heatmap-wrap{position:relative;max-width:520px;margin:1.5rem auto;padding-left:2rem;padding-bottom:2rem}
+.hm-y-label-wrap{position:absolute;left:-0.5rem;top:50%;transform:rotate(-90deg) translateX(-50%);transform-origin:0 0;white-space:nowrap;font-size:0.8rem;color:#555}
+.hm-axis-labels{text-align:center;margin-top:0.25rem}
+.hm-x-label{font-size:0.8rem;color:#555}
+.heatmap-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.hm-cell{text-align:center;font-size:clamp(0.55rem,2vw,0.8rem);padding:0;aspect-ratio:1;vertical-align:middle;border:1px solid #eee}
+.hm-empty{background:#f9f9f9}
+.hm-row-hdr,.hm-col-hdr{font-size:0.75rem;color:#555;text-align:center;padding:0.2rem;font-weight:600;border:none}
+.hm-corner{border:none}
+.legend-inline{display:flex;flex-wrap:wrap;gap:0.75rem;margin:0.5rem 0;font-size:0.85rem}
+.legend-inline span{display:inline-flex;align-items:center;gap:0.3rem}
+.legend-dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+@media(max-width:600px){
+  h1{font-size:1.3rem}
+  .container{padding:0.75rem 1rem 2rem}
+  .heatmap-wrap{max-width:100%;padding-left:1.5rem}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>World Values Survey &ndash; Synthetic Data Explorer</h1>
+
+<div class="intro">
+<p>This page presents an exploratory analysis of a <strong>synthetic (simulated) dataset</strong>
+modelled on the <a href="https://www.worldvaluessurvey.org/" target="_blank" rel="noopener">World Values Survey, Wave&nbsp;7</a>
+(Haerpfer, C., Inglehart, R., Moreno, A., Welzel, C., Kizilova, K., Diez-Medrano, J., Lagos, M., Norris, P., Ponarin, E., &amp; Puranen, B. (eds.), 2022.
+<em>World Values Survey: Round Seven &ndash; Country-Pooled Datafile</em>. Madrid &amp; Vienna: JD Systems Institute &amp; WVSA Secretariat).</p>
+<p>The rows are entirely <strong>fabricated</strong> to resemble real WVS distributions and relationships &mdash;
+<strong>no actual respondent data is used</strong>. Any patterns shown are illustrative only.</p>
+<p><strong>Countries included:</strong> China, India, Kazakhstan, Singapore, and Turkey
+(8,495 respondents after cleaning; 9,329 original rows).</p>
+</div>
+
+<h2>Data Summary</h2>
+<table class="summary-table">
+<thead><tr><th>Column</th><th>Data Type</th><th>Non-Empty Rows (of 9,329)</th></tr></thead>
+<tbody>
+<tr><td><code>country</code></td><td>Categorical</td><td>9,329</td></tr>
+<tr><td><code>age</code></td><td>Numeric</td><td>9,329</td></tr>
+<tr><td><code>urban_rural</code></td><td>Categorical</td><td>9,329</td></tr>
+<tr><td><code>income_level</code></td><td>Ordinal categorical</td><td>9,132</td></tr>
+<tr><td><code>sex</code></td><td>Categorical</td><td>9,329</td></tr>
+<tr><td><code>marital_status</code></td><td>Categorical</td><td>9,278</td></tr>
+<tr><td><code>education</code></td><td>Categorical</td><td>9,237</td></tr>
+<tr><td><code>life_satisfaction</code></td><td>Numeric</td><td>9,284</td></tr>
+<tr><td><code>freedom_of_choice</code></td><td>Numeric</td><td>9,249</td></tr>
+<tr><td><code>emancipative_values</code></td><td>Numeric (0–1 index)</td><td>9,234</td></tr>
+<tr><td><code>trust_people</code></td><td>Categorical</td><td>9,190</td></tr>
+<tr><td><code>importance_of_god</code></td><td>Numeric</td><td>9,232</td></tr>
+<tr><td><code>financial_satisfaction</code></td><td>Numeric</td><td>9,274</td></tr>
+<tr><td><code>secular_values</code></td><td>Numeric (0–1 index)</td><td>9,295</td></tr>
+
+</tbody>
+</table>
+<p class="note">No duplicate respondent IDs found
+(9,329 unique identifiers). <code>respondent_id</code> is excluded from all charts.</p>
+<p class="note">834 rows contained at least one missing value and were removed,
+leaving <strong>8,495 rows</strong> for the analyses below.</p>
+
+<h2>1. Cultural Map &mdash; Emancipative vs Secular Values</h2>
+<p style="font-size:0.9rem;color:#555">Each point is a country average (Inglehart&ndash;Welzel style).</p>
+<div class="chart-wrap"><canvas id="culturalMap"></canvas></div>
+<div class="takeaway">China scores highest on secular values and Singapore leads on emancipative values, while India shows the lowest secular-values score. The five countries span a wide range on the Inglehart–Welzel cultural map.</div>
+
+<h2>2. Value Fingerprints &mdash; Radar Chart</h2>
+<p style="font-size:0.9rem;color:#555">Six measures normalised to 0&ndash;1. One line per country.</p>
+<div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+<div class="takeaway">Countries differ most sharply on importance of god and interpersonal trust, while financial satisfaction shows the smallest gap across the five countries.</div>
+
+<h2>3. Individual Values &mdash; China vs India</h2>
+<p style="font-size:0.9rem;color:#555">~300 randomly sampled respondents per country; larger outlined points mark the country average.</p>
+<div class="chart-wrap"><canvas id="chinaIndia"></canvas></div>
+<div class="takeaway">Despite clearly different averages, individual responses from China and India overlap substantially — many respondents from both countries share similar value profiles.</div>
+
+<h2>4. Life vs Financial Satisfaction &mdash; Singapore</h2>
+<p style="font-size:0.9rem;color:#555">Each cell shows the number of Singaporean respondents at that combination.
+Darker&nbsp;=&nbsp;more respondents.</p>
+<div class="heatmap-wrap">
+<table class="heatmap-table"><tbody>
+<tr><td class="hm-corner"></td><td class="hm-col-hdr">1</td><td class="hm-col-hdr">2</td><td class="hm-col-hdr">3</td><td class="hm-col-hdr">4</td><td class="hm-col-hdr">5</td><td class="hm-col-hdr">6</td><td class="hm-col-hdr">7</td><td class="hm-col-hdr">8</td><td class="hm-col-hdr">9</td><td class="hm-col-hdr">10</td></tr>
+<tr><td class="hm-row-hdr">10</td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">5</td><td class="hm-cell" style="background:hsl(24, 100%, 88%);color:#333">18</td><td class="hm-cell" style="background:hsl(24, 100%, 73%);color:#333">56</td><td class="hm-cell" style="background:hsl(24, 100%, 84%);color:#333">28</td><td class="hm-cell" style="background:hsl(24, 100%, 68%);color:#333">69</td></tr>
+<tr><td class="hm-row-hdr">9</td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell" style="background:hsl(24, 100%, 95%);color:#333">1</td><td class="hm-cell" style="background:hsl(24, 100%, 92%);color:#333">7</td><td class="hm-cell" style="background:hsl(24, 100%, 90%);color:#333">13</td><td class="hm-cell" style="background:hsl(24, 100%, 81%);color:#333">35</td><td class="hm-cell" style="background:hsl(24, 100%, 76%);color:#333">50</td><td class="hm-cell" style="background:hsl(24, 100%, 88%);color:#333">19</td><td class="hm-cell" style="background:hsl(24, 100%, 86%);color:#333">23</td></tr>
+<tr><td class="hm-row-hdr">8</td><td class="hm-cell hm-empty"></td><td class="hm-cell" style="background:hsl(24, 100%, 95%);color:#333">1</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">3</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">4</td><td class="hm-cell" style="background:hsl(24, 100%, 78%);color:#333">44</td><td class="hm-cell" style="background:hsl(24, 100%, 74%);color:#333">55</td><td class="hm-cell" style="background:hsl(24, 100%, 40%);color:#fff">142</td><td class="hm-cell" style="background:hsl(24, 100%, 50%);color:#fff">117</td><td class="hm-cell" style="background:hsl(24, 100%, 78%);color:#333">44</td><td class="hm-cell" style="background:hsl(24, 100%, 83%);color:#333">32</td></tr>
+<tr><td class="hm-row-hdr">7</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">2</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">2</td><td class="hm-cell" style="background:hsl(24, 100%, 90%);color:#333">13</td><td class="hm-cell" style="background:hsl(24, 100%, 86%);color:#333">22</td><td class="hm-cell" style="background:hsl(24, 100%, 61%);color:#333">89</td><td class="hm-cell" style="background:hsl(24, 100%, 46%);color:#fff">126</td><td class="hm-cell" style="background:hsl(24, 100%, 43%);color:#fff">134</td><td class="hm-cell" style="background:hsl(24, 100%, 57%);color:#333">98</td><td class="hm-cell" style="background:hsl(24, 100%, 89%);color:#333">15</td><td class="hm-cell" style="background:hsl(24, 100%, 92%);color:#333">7</td></tr>
+<tr><td class="hm-row-hdr">6</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">2</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">5</td><td class="hm-cell" style="background:hsl(24, 100%, 92%);color:#333">7</td><td class="hm-cell" style="background:hsl(24, 100%, 86%);color:#333">22</td><td class="hm-cell" style="background:hsl(24, 100%, 73%);color:#333">57</td><td class="hm-cell" style="background:hsl(24, 100%, 75%);color:#333">52</td><td class="hm-cell" style="background:hsl(24, 100%, 73%);color:#333">56</td><td class="hm-cell" style="background:hsl(24, 100%, 84%);color:#333">28</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">5</td><td class="hm-cell" style="background:hsl(24, 100%, 95%);color:#333">1</td></tr>
+<tr><td class="hm-row-hdr">5</td><td class="hm-cell" style="background:hsl(24, 100%, 92%);color:#333">8</td><td class="hm-cell" style="background:hsl(24, 100%, 89%);color:#333">15</td><td class="hm-cell" style="background:hsl(24, 100%, 85%);color:#333">26</td><td class="hm-cell" style="background:hsl(24, 100%, 84%);color:#333">28</td><td class="hm-cell" style="background:hsl(24, 100%, 68%);color:#333">70</td><td class="hm-cell" style="background:hsl(24, 100%, 76%);color:#333">50</td><td class="hm-cell" style="background:hsl(24, 100%, 83%);color:#333">32</td><td class="hm-cell" style="background:hsl(24, 100%, 87%);color:#333">21</td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td></tr>
+<tr><td class="hm-row-hdr">4</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">6</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">6</td><td class="hm-cell" style="background:hsl(24, 100%, 92%);color:#333">9</td><td class="hm-cell" style="background:hsl(24, 100%, 91%);color:#333">11</td><td class="hm-cell" style="background:hsl(24, 100%, 86%);color:#333">22</td><td class="hm-cell" style="background:hsl(24, 100%, 92%);color:#333">9</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">6</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">3</td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td></tr>
+<tr><td class="hm-row-hdr">3</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">6</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">5</td><td class="hm-cell" style="background:hsl(24, 100%, 92%);color:#333">9</td><td class="hm-cell" style="background:hsl(24, 100%, 92%);color:#333">8</td><td class="hm-cell" style="background:hsl(24, 100%, 92%);color:#333">8</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">5</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">3</td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td></tr>
+<tr><td class="hm-row-hdr">2</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">3</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">2</td><td class="hm-cell" style="background:hsl(24, 100%, 95%);color:#333">1</td><td class="hm-cell hm-empty"></td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">3</td><td class="hm-cell hm-empty"></td><td class="hm-cell" style="background:hsl(24, 100%, 95%);color:#333">1</td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td></tr>
+<tr><td class="hm-row-hdr">1</td><td class="hm-cell" style="background:hsl(24, 100%, 93%);color:#333">5</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">3</td><td class="hm-cell" style="background:hsl(24, 100%, 94%);color:#333">3</td><td class="hm-cell" style="background:hsl(24, 100%, 95%);color:#333">1</td><td class="hm-cell" style="background:hsl(24, 100%, 95%);color:#333">1</td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td><td class="hm-cell hm-empty"></td></tr>
+</tbody></table>
+<div class="hm-axis-labels"><span class="hm-x-label">Financial Satisfaction &rarr;</span></div>
+<div class="hm-y-label-wrap"><span class="hm-y-label">Life Satisfaction &rarr;</span></div>
+</div>
+
+<div class="takeaway">The densest cluster sits at life satisfaction = 8 and financial satisfaction = 7 (142 respondents). Higher financial satisfaction generally coincides with higher life satisfaction.</div>
+
+</div><!-- .container -->
+
+<script>
+// ── Embedded data ──
+const COLORS = {"China": "#E69F00", "Singapore": "#D55E00", "Turkey": "#CC79A7", "India": "#0072B2", "Kazakhstan": "#009E73"};
+const MARKERS = {"China": "circle", "Singapore": "triangle", "Turkey": "star", "India": "rectRot", "Kazakhstan": "rect"};
+const culturalMap = {"China": {"x": 0.4049, "y": 0.3929}, "India": {"x": 0.2622, "y": 0.3759}, "Kazakhstan": {"x": 0.3716, "y": 0.3736}, "Singapore": {"x": 0.3117, "y": 0.4479}, "Turkey": {"x": 0.2742, "y": 0.3594}};
+const radarLabels = ["Life Satisfaction","Trust (share)","Importance of God","Emancipative Values","Secular Values","Financial Satisfaction"];
+const radarData = {"China": [0.7475, 0.6561, 0.2759, 0.3929, 0.4049, 0.6594], "India": [0.7251, 0.1851, 0.7853, 0.3759, 0.2622, 0.6427], "Kazakhstan": [0.7041, 0.2416, 0.7828, 0.3736, 0.3716, 0.6289], "Singapore": [0.7006, 0.3493, 0.6674, 0.4479, 0.3117, 0.6532], "Turkey": [0.6395, 0.1554, 0.8109, 0.3594, 0.2742, 0.5822]};
+const chinaPts = [{"x": 0.3499, "y": 0.4104}, {"x": 0.421, "y": 0.3997}, {"x": 0.3323, "y": 0.4522}, {"x": 0.4945, "y": 0.408}, {"x": 0.3933, "y": 0.4503}, {"x": 0.4174, "y": 0.348}, {"x": 0.6032, "y": 0.4323}, {"x": 0.3787, "y": 0.4527}, {"x": 0.2737, "y": 0.3538}, {"x": 0.3231, "y": 0.2654}, {"x": 0.4149, "y": 0.3876}, {"x": 0.401, "y": 0.3308}, {"x": 0.2701, "y": 0.2563}, {"x": 0.272, "y": 0.2981}, {"x": 0.2726, "y": 0.2191}, {"x": 0.6101, "y": 0.2969}, {"x": 0.5015, "y": 0.5365}, {"x": 0.3007, "y": 0.4132}, {"x": 0.224, "y": 0.1989}, {"x": 0.5713, "y": 0.3998}, {"x": 0.27, "y": 0.324}, {"x": 0.3968, "y": 0.3248}, {"x": 0.5182, "y": 0.3347}, {"x": 0.3299, "y": 0.3037}, {"x": 0.3266, "y": 0.223}, {"x": 0.2038, "y": 0.3085}, {"x": 0.45, "y": 0.3846}, {"x": 0.3199, "y": 0.393}, {"x": 0.5538, "y": 0.302}, {"x": 0.4287, "y": 0.3009}, {"x": 0.268, "y": 0.0977}, {"x": 0.2349, "y": 0.5433}, {"x": 0.3967, "y": 0.4591}, {"x": 0.478, "y": 0.4692}, {"x": 0.4359, "y": 0.4476}, {"x": 0.4659, "y": 0.2574}, {"x": 0.7538, "y": 0.3776}, {"x": 0.3465, "y": 0.4568}, {"x": 0.2535, "y": 0.7343}, {"x": 0.3182, "y": 0.4885}, {"x": 0.3177, "y": 0.2957}, {"x": 0.412, "y": 0.458}, {"x": 0.4378, "y": 0.5676}, {"x": 0.2846, "y": 0.3245}, {"x": 0.3616, "y": 0.3055}, {"x": 0.3159, "y": 0.3866}, {"x": 0.4342, "y": 0.3706}, {"x": 0.385, "y": 0.2681}, {"x": 0.3689, "y": 0.4164}, {"x": 0.4929, "y": 0.4592}, {"x": 0.3806, "y": 0.3028}, {"x": 0.3996, "y": 0.2698}, {"x": 0.3531, "y": 0.4623}, {"x": 0.1943, "y": 0.4848}, {"x": 0.4384, "y": 0.3981}, {"x": 0.6485, "y": 0.7141}, {"x": 0.4421, "y": 0.2149}, {"x": 0.4234, "y": 0.2641}, {"x": 0.3862, "y": 0.2651}, {"x": 0.3261, "y": 0.5011}, {"x": 0.2024, "y": 0.3145}, {"x": 0.4439, "y": 0.288}, {"x": 0.7063, "y": 0.3505}, {"x": 0.1827, "y": 0.7173}, {"x": 0.4517, "y": 0.312}, {"x": 0.6908, "y": 0.4565}, {"x": 0.7289, "y": 0.7209}, {"x": 0.31, "y": 0.4238}, {"x": 0.5507, "y": 0.3264}, {"x": 0.7205, "y": 0.4392}, {"x": 0.5476, "y": 0.3439}, {"x": 0.3136, "y": 0.2699}, {"x": 0.3823, "y": 0.3219}, {"x": 0.2987, "y": 0.4707}, {"x": 0.2031, "y": 0.4577}, {"x": 0.3329, "y": 0.4194}, {"x": 0.3535, "y": 0.3862}, {"x": 0.2048, "y": 0.2539}, {"x": 0.5357, "y": 0.3428}, {"x": 0.3396, "y": 0.1501}, {"x": 0.4469, "y": 0.3738}, {"x": 0.359, "y": 0.7574}, {"x": 0.4765, "y": 0.4313}, {"x": 0.4248, "y": 0.3132}, {"x": 0.6356, "y": 0.4576}, {"x": 0.1305, "y": 0.3554}, {"x": 0.4485, "y": 0.2545}, {"x": 0.556, "y": 0.4716}, {"x": 0.4081, "y": 0.412}, {"x": 0.5619, "y": 0.561}, {"x": 0.2461, "y": 0.2541}, {"x": 0.3367, "y": 0.2091}, {"x": 0.3425, "y": 0.2743}, {"x": 0.4427, "y": 0.3619}, {"x": 0.6667, "y": 0.4892}, {"x": 0.4305, "y": 0.2653}, {"x": 0.3233, "y": 0.1972}, {"x": 0.4847, "y": 0.2109}, {"x": 0.4025, "y": 0.4072}, {"x": 0.335, "y": 0.5143}, {"x": 0.3114, "y": 0.4743}, {"x": 0.1486, "y": 0.2018}, {"x": 0.2597, "y": 0.4326}, {"x": 0.3629, "y": 0.3133}, {"x": 0.4019, "y": 0.4283}, {"x": 0.5001, "y": 0.2548}, {"x": 0.4427, "y": 0.3458}, {"x": 0.3829, "y": 0.1614}, {"x": 0.465, "y": 0.3282}, {"x": 0.6639, "y": 0.468}, {"x": 0.3231, "y": 0.3471}, {"x": 0.2929, "y": 0.4796}, {"x": 0.3116, "y": 0.277}, {"x": 0.2897, "y": 0.3693}, {"x": 0.3574, "y": 0.6211}, {"x": 0.5768, "y": 0.4708}, {"x": 0.5026, "y": 0.4442}, {"x": 0.2616, "y": 0.2968}, {"x": 0.3955, "y": 0.4283}, {"x": 0.6178, "y": 0.4298}, {"x": 0.4119, "y": 0.4144}, {"x": 0.5274, "y": 0.5835}, {"x": 0.4524, "y": 0.3516}, {"x": 0.3701, "y": 0.3917}, {"x": 0.2139, "y": 0.4383}, {"x": 0.6129, "y": 0.3352}, {"x": 0.4735, "y": 0.4248}, {"x": 0.3432, "y": 0.3842}, {"x": 0.2968, "y": 0.4137}, {"x": 0.323, "y": 0.2597}, {"x": 0.6015, "y": 0.593}, {"x": 0.2368, "y": 0.2926}, {"x": 0.4013, "y": 0.4179}, {"x": 0.6297, "y": 0.5057}, {"x": 0.3091, "y": 0.3027}, {"x": 0.3248, "y": 0.5082}, {"x": 0.3769, "y": 0.2117}, {"x": 0.35, "y": 0.3607}, {"x": 0.3651, "y": 0.3963}, {"x": 0.3501, "y": 0.3613}, {"x": 0.2937, "y": 0.5638}, {"x": 0.4536, "y": 0.5816}, {"x": 0.1471, "y": 0.2504}, {"x": 0.3734, "y": 0.3229}, {"x": 0.2279, "y": 0.3767}, {"x": 0.3982, "y": 0.2681}, {"x": 0.3345, "y": 0.5185}, {"x": 0.2689, "y": 0.3084}, {"x": 0.3555, "y": 0.4533}, {"x": 0.2543, "y": 0.276}, {"x": 0.4313, "y": 0.4754}, {"x": 0.6119, "y": 0.644}, {"x": 0.3402, "y": 0.4782}, {"x": 0.5176, "y": 0.2986}, {"x": 0.4456, "y": 0.413}, {"x": 0.1923, "y": 0.2837}, {"x": 0.3209, "y": 0.6416}, {"x": 0.2812, "y": 0.3793}, {"x": 0.4584, "y": 0.3858}, {"x": 0.3589, "y": 0.4697}, {"x": 0.157, "y": 0.2654}, {"x": 0.5498, "y": 0.5085}, {"x": 0.3642, "y": 0.4159}, {"x": 0.2297, "y": 0.4034}, {"x": 0.4246, "y": 0.3557}, {"x": 0.319, "y": 0.3706}, {"x": 0.266, "y": 0.5}, {"x": 0.2841, "y": 0.2745}, {"x": 0.2833, "y": 0.4472}, {"x": 0.2801, "y": 0.3897}, {"x": 0.2467, "y": 0.2996}, {"x": 0.2455, "y": 0.3208}, {"x": 0.6126, "y": 0.3002}, {"x": 0.5062, "y": 0.2438}, {"x": 0.3819, "y": 0.1058}, {"x": 0.3491, "y": 0.3964}, {"x": 0.4408, "y": 0.424}, {"x": 0.4895, "y": 0.4758}, {"x": 0.3221, "y": 0.4369}, {"x": 0.2778, "y": 0.2702}, {"x": 0.2588, "y": 0.6121}, {"x": 0.3873, "y": 0.1805}, {"x": 0.3857, "y": 0.2798}, {"x": 0.39, "y": 0.4806}, {"x": 0.2724, "y": 0.4221}, {"x": 0.358, "y": 0.2326}, {"x": 0.3418, "y": 0.5065}, {"x": 0.2701, "y": 0.3784}, {"x": 0.254, "y": 0.3946}, {"x": 0.6004, "y": 0.3727}, {"x": 0.4364, "y": 0.6473}, {"x": 0.3981, "y": 0.2845}, {"x": 0.4865, "y": 0.4222}, {"x": 0.4032, "y": 0.4389}, {"x": 0.4542, "y": 0.4245}, {"x": 0.4268, "y": 0.3627}, {"x": 0.3204, "y": 0.2964}, {"x": 0.3631, "y": 0.4891}, {"x": 0.4495, "y": 0.4462}, {"x": 0.4229, "y": 0.4154}, {"x": 0.6978, "y": 0.3597}, {"x": 0.379, "y": 0.5237}, {"x": 0.5439, "y": 0.4551}, {"x": 0.3832, "y": 0.4658}, {"x": 0.5015, "y": 0.4497}, {"x": 0.3922, "y": 0.3751}, {"x": 0.4843, "y": 0.3048}, {"x": 0.2653, "y": 0.3349}, {"x": 0.316, "y": 0.3317}, {"x": 0.5625, "y": 0.4838}, {"x": 0.3809, "y": 0.1811}, {"x": 0.3474, "y": 0.4204}, {"x": 0.3676, "y": 0.3886}, {"x": 0.2931, "y": 0.3706}, {"x": 0.3598, "y": 0.345}, {"x": 0.2727, "y": 0.362}, {"x": 0.6477, "y": 0.4496}, {"x": 0.3492, "y": 0.335}, {"x": 0.3294, "y": 0.4038}, {"x": 0.5846, "y": 0.4}, {"x": 0.3891, "y": 0.3394}, {"x": 0.461, "y": 0.463}, {"x": 0.285, "y": 0.3934}, {"x": 0.3791, "y": 0.2086}, {"x": 0.1464, "y": 0.5785}, {"x": 0.3969, "y": 0.5475}, {"x": 0.3329, "y": 0.3953}, {"x": 0.5816, "y": 0.3108}, {"x": 0.1695, "y": 0.5984}, {"x": 0.4077, "y": 0.5088}, {"x": 0.4441, "y": 0.4054}, {"x": 0.3788, "y": 0.1289}, {"x": 0.6325, "y": 0.3839}, {"x": 0.3615, "y": 0.3632}, {"x": 0.5096, "y": 0.6867}, {"x": 0.3846, "y": 0.3434}, {"x": 0.3868, "y": 0.5451}, {"x": 0.4936, "y": 0.3253}, {"x": 0.6763, "y": 0.305}, {"x": 0.5924, "y": 0.1829}, {"x": 0.5255, "y": 0.3366}, {"x": 0.3889, "y": 0.5116}, {"x": 0.3578, "y": 0.3435}, {"x": 0.3239, "y": 0.599}, {"x": 0.4438, "y": 0.4902}, {"x": 0.2083, "y": 0.3045}, {"x": 0.2815, "y": 0.4845}, {"x": 0.3881, "y": 0.4345}, {"x": 0.5185, "y": 0.3281}, {"x": 0.4392, "y": 0.1516}, {"x": 0.3631, "y": 0.421}, {"x": 0.3612, "y": 0.4357}, {"x": 0.3805, "y": 0.2284}, {"x": 0.2896, "y": 0.2585}, {"x": 0.5632, "y": 0.5073}, {"x": 0.3339, "y": 0.2986}, {"x": 0.5613, "y": 0.3932}, {"x": 0.3202, "y": 0.2638}, {"x": 0.3318, "y": 0.5452}, {"x": 0.2462, "y": 0.6789}, {"x": 0.5167, "y": 0.4052}, {"x": 0.3718, "y": 0.4615}, {"x": 0.3704, "y": 0.3676}, {"x": 0.3017, "y": 0.5393}, {"x": 0.266, "y": 0.3097}, {"x": 0.3016, "y": 0.3505}, {"x": 0.5253, "y": 0.4481}, {"x": 0.7312, "y": 0.6677}, {"x": 0.3544, "y": 0.5229}, {"x": 0.2805, "y": 0.1977}, {"x": 0.2029, "y": 0.3847}, {"x": 0.1189, "y": 0.3292}, {"x": 0.6407, "y": 0.5001}, {"x": 0.3448, "y": 0.4337}, {"x": 0.5894, "y": 0.5508}, {"x": 0.7063, "y": 0.2971}, {"x": 0.3485, "y": 0.4923}, {"x": 0.587, "y": 0.3053}, {"x": 0.4297, "y": 0.4466}, {"x": 0.4048, "y": 0.6058}, {"x": 0.3658, "y": 0.3061}, {"x": 0.416, "y": 0.5023}, {"x": 0.2539, "y": 0.4273}, {"x": 0.4544, "y": 0.368}, {"x": 0.4619, "y": 0.4858}, {"x": 0.364, "y": 0.5902}, {"x": 0.3527, "y": 0.5559}, {"x": 0.3845, "y": 0.6034}, {"x": 0.3663, "y": 0.0364}, {"x": 0.3645, "y": 0.4326}, {"x": 0.668, "y": 0.4524}, {"x": 0.4433, "y": 0.6643}, {"x": 0.4224, "y": 0.3487}, {"x": 0.3527, "y": 0.3366}, {"x": 0.3029, "y": 0.4475}, {"x": 0.2001, "y": 0.2177}, {"x": 0.3885, "y": 0.3134}, {"x": 0.2768, "y": 0.3502}, {"x": 0.4148, "y": 0.2017}, {"x": 0.4217, "y": 0.2687}];
+const indiaPts = [{"x": 0.2118, "y": 0.5418}, {"x": 0.3542, "y": 0.6029}, {"x": 0.4218, "y": 0.1091}, {"x": 0.4094, "y": 0.1723}, {"x": 0.0683, "y": 0.2154}, {"x": 0.4595, "y": 0.313}, {"x": 0.0817, "y": 0.2709}, {"x": 0.3233, "y": 0.2802}, {"x": 0.0746, "y": 0.4735}, {"x": 0.3008, "y": 0.5259}, {"x": 0.4389, "y": 0.7568}, {"x": 0.2073, "y": 0.4856}, {"x": 0.247, "y": 0.5141}, {"x": 0.3679, "y": 0.5814}, {"x": 0.2483, "y": 0.258}, {"x": 0.1438, "y": 0.2605}, {"x": 0.2078, "y": 0.2557}, {"x": 0.255, "y": 0.4845}, {"x": 0.1081, "y": 0.275}, {"x": 0.4127, "y": 0.5172}, {"x": 0.3678, "y": 0.2596}, {"x": 0.4089, "y": 0.1971}, {"x": 0.1584, "y": 0.545}, {"x": 0.4899, "y": 0.6846}, {"x": 0.1623, "y": 0.3731}, {"x": 0.1328, "y": 0.385}, {"x": 0.4229, "y": 0.3405}, {"x": 0.181, "y": 0.5208}, {"x": 0.0955, "y": 0.3079}, {"x": 0.5323, "y": 0.5912}, {"x": 0.2839, "y": 0.323}, {"x": 0.0741, "y": 0.2708}, {"x": 0.3055, "y": 0.3367}, {"x": 0.1297, "y": 0.1725}, {"x": 0.1866, "y": 0.5601}, {"x": 0.5347, "y": 0.315}, {"x": 0.3743, "y": 0.2686}, {"x": 0.4131, "y": 0.5026}, {"x": 0.5495, "y": 0.3994}, {"x": 0.1855, "y": 0.3069}, {"x": 0.3055, "y": 0.2207}, {"x": 0.6718, "y": 0.3414}, {"x": 0.1635, "y": 0.4001}, {"x": 0.4182, "y": 0.7922}, {"x": 0.2551, "y": 0.4986}, {"x": 0.349, "y": 0.3681}, {"x": 0.1858, "y": 0.3357}, {"x": 0.4002, "y": 0.3529}, {"x": 0.1579, "y": 0.3266}, {"x": 0.093, "y": 0.5465}, {"x": 0.1792, "y": 0.2441}, {"x": 0.4333, "y": 0.5522}, {"x": 0.2174, "y": 0.2192}, {"x": 0.5671, "y": 0.5565}, {"x": 0.0165, "y": 0.3139}, {"x": 0.5512, "y": 0.4768}, {"x": 0.1729, "y": 0.3526}, {"x": 0.2018, "y": 0.4542}, {"x": 0.0416, "y": 0.3629}, {"x": 0.2946, "y": 0.1605}, {"x": 0.3839, "y": 0.3785}, {"x": 0.4688, "y": 0.4366}, {"x": 0.1135, "y": 0.4311}, {"x": 0.3087, "y": 0.3397}, {"x": 0.12, "y": 0.4378}, {"x": 0.1343, "y": 0.53}, {"x": 0.4032, "y": 0.2791}, {"x": 0.383, "y": 0.4548}, {"x": 0.3491, "y": 0.3555}, {"x": 0.0, "y": 0.3052}, {"x": 0.1242, "y": 0.2079}, {"x": 0.4184, "y": 0.2071}, {"x": 0.2066, "y": 0.3146}, {"x": 0.2054, "y": 0.2158}, {"x": 0.3318, "y": 0.1981}, {"x": 0.695, "y": 0.3889}, {"x": 0.277, "y": 0.358}, {"x": 0.1537, "y": 0.3694}, {"x": 0.5522, "y": 0.4081}, {"x": 0.2305, "y": 0.2579}, {"x": 0.7206, "y": 0.4367}, {"x": 0.2667, "y": 0.5468}, {"x": 0.2283, "y": 0.1169}, {"x": 0.0619, "y": 0.2242}, {"x": 0.3376, "y": 0.2}, {"x": 0.4256, "y": 0.2595}, {"x": 0.2091, "y": 0.2969}, {"x": 0.1166, "y": 0.3021}, {"x": 0.2114, "y": 0.6082}, {"x": 0.1879, "y": 0.3395}, {"x": 0.3522, "y": 0.4888}, {"x": 0.0795, "y": 0.391}, {"x": 0.1283, "y": 0.4925}, {"x": 0.1226, "y": 0.2351}, {"x": 0.3566, "y": 0.3009}, {"x": 0.4534, "y": 0.458}, {"x": 0.0919, "y": 0.3302}, {"x": 0.2552, "y": 0.3173}, {"x": 0.156, "y": 0.3141}, {"x": 0.0967, "y": 0.3166}, {"x": 0.6359, "y": 0.4687}, {"x": 0.0717, "y": 0.1944}, {"x": 0.1689, "y": 0.5875}, {"x": 0.3562, "y": 0.3771}, {"x": 0.0602, "y": 0.4651}, {"x": 0.1332, "y": 0.3302}, {"x": 0.3623, "y": 0.3011}, {"x": 0.201, "y": 0.2104}, {"x": 0.1772, "y": 0.3761}, {"x": 0.4136, "y": 0.3426}, {"x": 0.094, "y": 0.3339}, {"x": 0.3719, "y": 0.1533}, {"x": 0.1642, "y": 0.4915}, {"x": 0.0303, "y": 0.5862}, {"x": 0.0978, "y": 0.588}, {"x": 0.3618, "y": 0.3207}, {"x": 0.2452, "y": 0.6325}, {"x": 0.1333, "y": 0.531}, {"x": 0.228, "y": 0.4943}, {"x": 0.2263, "y": 0.3841}, {"x": 0.2439, "y": 0.3387}, {"x": 0.0675, "y": 0.2718}, {"x": 0.1311, "y": 0.2504}, {"x": 0.0942, "y": 0.5291}, {"x": 0.1069, "y": 0.2458}, {"x": 0.6487, "y": 0.3301}, {"x": 0.3942, "y": 0.4553}, {"x": 0.3494, "y": 0.2443}, {"x": 0.3691, "y": 0.3149}, {"x": 0.3885, "y": 0.3805}, {"x": 0.1903, "y": 0.2355}, {"x": 0.2948, "y": 0.3864}, {"x": 0.1902, "y": 0.3651}, {"x": 0.3876, "y": 0.386}, {"x": 0.1527, "y": 0.1404}, {"x": 0.1169, "y": 0.7353}, {"x": 0.293, "y": 0.3595}, {"x": 0.2409, "y": 0.1725}, {"x": 0.3441, "y": 0.3185}, {"x": 0.2947, "y": 0.6023}, {"x": 0.2596, "y": 0.3738}, {"x": 0.6429, "y": 0.4933}, {"x": 0.0882, "y": 0.3489}, {"x": 0.2354, "y": 0.1822}, {"x": 0.4026, "y": 0.3864}, {"x": 0.2586, "y": 0.5641}, {"x": 0.4738, "y": 0.3777}, {"x": 0.0855, "y": 0.4095}, {"x": 0.2689, "y": 0.4783}, {"x": 0.1064, "y": 0.4484}, {"x": 0.3838, "y": 0.2832}, {"x": 0.2158, "y": 0.2962}, {"x": 0.2114, "y": 0.7338}, {"x": 0.2219, "y": 0.5222}, {"x": 0.0545, "y": 0.0103}, {"x": 0.3116, "y": 0.3821}, {"x": 0.4246, "y": 0.4034}, {"x": 0.4992, "y": 0.5413}, {"x": 0.2366, "y": 0.2485}, {"x": 0.4135, "y": 0.5389}, {"x": 0.1736, "y": 0.6156}, {"x": 0.0616, "y": 0.6076}, {"x": 0.5727, "y": 0.4008}, {"x": 0.3426, "y": 0.4666}, {"x": 0.1014, "y": 0.1994}, {"x": 0.2052, "y": 0.3574}, {"x": 0.4198, "y": 0.3684}, {"x": 0.2845, "y": 0.2543}, {"x": 0.0928, "y": 0.261}, {"x": 0.1499, "y": 0.4832}, {"x": 0.7601, "y": 0.2691}, {"x": 0.1531, "y": 0.2312}, {"x": 0.4242, "y": 0.5595}, {"x": 0.0647, "y": 0.3142}, {"x": 0.0809, "y": 0.176}, {"x": 0.2232, "y": 0.2902}, {"x": 0.0915, "y": 0.2216}, {"x": 0.0847, "y": 0.6552}, {"x": 0.1826, "y": 0.355}, {"x": 0.1792, "y": 0.5214}, {"x": 0.624, "y": 0.5251}, {"x": 0.3082, "y": 0.6071}, {"x": 0.4969, "y": 0.4174}, {"x": 0.5343, "y": 0.3717}, {"x": 0.1074, "y": 0.4763}, {"x": 0.4102, "y": 0.2664}, {"x": 0.0795, "y": 0.4212}, {"x": 0.1165, "y": 0.185}, {"x": 0.2053, "y": 0.3525}, {"x": 0.0391, "y": 0.1444}, {"x": 0.3193, "y": 0.3276}, {"x": 0.1111, "y": 0.5896}, {"x": 0.1661, "y": 0.2451}, {"x": 0.4256, "y": 0.3785}, {"x": 0.2167, "y": 0.3562}, {"x": 0.1757, "y": 0.3469}, {"x": 0.3516, "y": 0.3579}, {"x": 0.178, "y": 0.4145}, {"x": 0.2358, "y": 0.5717}, {"x": 0.4655, "y": 0.5194}, {"x": 0.1863, "y": 0.2676}, {"x": 0.0, "y": 0.4657}, {"x": 0.1487, "y": 0.279}, {"x": 0.1691, "y": 0.3636}, {"x": 0.0535, "y": 0.5134}, {"x": 0.1986, "y": 0.1986}, {"x": 0.3299, "y": 0.1037}, {"x": 0.3844, "y": 0.3141}, {"x": 0.3834, "y": 0.1723}, {"x": 0.3158, "y": 0.3678}, {"x": 0.3646, "y": 0.3759}, {"x": 0.6385, "y": 0.5887}, {"x": 0.1065, "y": 0.6199}, {"x": 0.2707, "y": 0.2149}, {"x": 0.3905, "y": 0.2987}, {"x": 0.1936, "y": 0.2245}, {"x": 0.1668, "y": 0.2049}, {"x": 0.4608, "y": 0.3904}, {"x": 0.3153, "y": 0.2791}, {"x": 0.4412, "y": 0.5359}, {"x": 0.3612, "y": 0.2646}, {"x": 0.1972, "y": 0.5205}, {"x": 0.1062, "y": 0.3969}, {"x": 0.271, "y": 0.378}, {"x": 0.2451, "y": 0.571}, {"x": 0.0822, "y": 0.1327}, {"x": 0.0795, "y": 0.2911}, {"x": 0.2656, "y": 0.2461}, {"x": 0.176, "y": 0.3694}, {"x": 0.1949, "y": 0.4426}, {"x": 0.2818, "y": 0.6092}, {"x": 0.1084, "y": 0.1951}, {"x": 0.3793, "y": 0.4304}, {"x": 0.2862, "y": 0.3538}, {"x": 0.4495, "y": 0.1994}, {"x": 0.0811, "y": 0.3426}, {"x": 0.4977, "y": 0.4938}, {"x": 0.0337, "y": 0.1937}, {"x": 0.1707, "y": 0.3349}, {"x": 0.2052, "y": 0.4464}, {"x": 0.3686, "y": 0.5634}, {"x": 0.1546, "y": 0.5867}, {"x": 0.3884, "y": 0.4629}, {"x": 0.3543, "y": 0.3289}, {"x": 0.1018, "y": 0.3855}, {"x": 0.1973, "y": 0.3936}, {"x": 0.1354, "y": 0.4984}, {"x": 0.1313, "y": 0.3638}, {"x": 0.1464, "y": 0.5395}, {"x": 0.219, "y": 0.2909}, {"x": 0.1953, "y": 0.4524}, {"x": 0.4154, "y": 0.4401}, {"x": 0.2708, "y": 0.1976}, {"x": 0.3041, "y": 0.3303}, {"x": 0.1745, "y": 0.2418}, {"x": 0.0, "y": 0.5875}, {"x": 0.204, "y": 0.1054}, {"x": 0.2675, "y": 0.4597}, {"x": 0.4023, "y": 0.5294}, {"x": 0.1563, "y": 0.1874}, {"x": 0.2501, "y": 0.3313}, {"x": 0.5086, "y": 0.2661}, {"x": 0.4008, "y": 0.3122}, {"x": 0.4658, "y": 0.5066}, {"x": 0.0931, "y": 0.6054}, {"x": 0.2323, "y": 0.5589}, {"x": 0.1846, "y": 0.1796}, {"x": 0.2699, "y": 0.3011}, {"x": 0.2886, "y": 0.4494}, {"x": 0.133, "y": 0.3161}, {"x": 0.2524, "y": 0.2393}, {"x": 0.4263, "y": 0.3025}, {"x": 0.156, "y": 0.1956}, {"x": 0.1912, "y": 0.2827}, {"x": 0.3619, "y": 0.247}, {"x": 0.079, "y": 0.152}, {"x": 0.4926, "y": 0.3325}, {"x": 0.096, "y": 0.4898}, {"x": 0.1194, "y": 0.3772}, {"x": 0.1646, "y": 0.1508}, {"x": 0.2876, "y": 0.2317}, {"x": 0.099, "y": 0.2423}, {"x": 0.1748, "y": 0.4275}, {"x": 0.2898, "y": 0.4617}, {"x": 0.2364, "y": 0.3815}, {"x": 0.0723, "y": 0.3307}, {"x": 0.1671, "y": 0.3387}, {"x": 0.4138, "y": 0.2661}, {"x": 0.1908, "y": 0.6273}, {"x": 0.1652, "y": 0.3039}, {"x": 0.688, "y": 0.3902}, {"x": 0.4742, "y": 0.2714}, {"x": 0.2836, "y": 0.1632}, {"x": 0.6759, "y": 0.5609}, {"x": 0.1965, "y": 0.4863}, {"x": 0.5619, "y": 0.5859}, {"x": 0.5171, "y": 0.5864}, {"x": 0.2946, "y": 0.2379}, {"x": 0.287, "y": 0.3286}, {"x": 0.2927, "y": 0.2731}];
+const chinaAvg = {"x": 0.4049, "y": 0.3929};
+const indiaAvg = {"x": 0.2622, "y": 0.3759};
+const countryOrder = ["China", "India", "Kazakhstan", "Singapore", "Turkey"];
+
+// ── Helpers ──
+const fmt = (v) => Number(v).toFixed(2);
+
+// ── 1. Cultural Map ──
+new Chart(document.getElementById('culturalMap'), {
+  type: 'scatter',
+  data: {
+    datasets: countryOrder.map(c => ({
+      label: c,
+      data: [culturalMap[c]],
+      backgroundColor: COLORS[c],
+      borderColor: COLORS[c],
+      pointStyle: MARKERS[c],
+      pointRadius: 10,
+      borderWidth: 2
+    }))
+  },
+  options: {
+    responsive: true,
+    aspectRatio: 1.3,
+    scales: {
+      x: { title: { display: true, text: 'Secular Values' }, min: 0, max: 0.8, ticks: { callback: v => v.toFixed(1) } },
+      y: { title: { display: true, text: 'Emancipative Values' }, min: 0, max: 0.8, ticks: { callback: v => v.toFixed(1) } }
+    },
+    plugins: {
+      tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': (' + fmt(ctx.parsed.x) + ', ' + fmt(ctx.parsed.y) + ')' } },
+      legend: { labels: { usePointStyle: true, pointStyle: (ctx) => MARKERS[countryOrder[ctx.datasetIndex]] } }
+    }
+  },
+  plugins: [{
+    afterDraw(chart) {
+      const ctx2 = chart.ctx;
+      chart.data.datasets.forEach((ds, i) => {
+        const meta = chart.getDatasetMeta(i);
+        if (!meta.data[0]) return;
+        const pt = meta.data[0];
+        ctx2.save();
+        ctx2.fillStyle = '#333';
+        ctx2.font = 'bold 12px sans-serif';
+        ctx2.fillText(ds.label, pt.x + 14, pt.y - 10);
+        ctx2.restore();
+      });
+    }
+  }]
+});
+
+// ── 2. Radar ──
+new Chart(document.getElementById('radarChart'), {
+  type: 'radar',
+  data: {
+    labels: radarLabels,
+    datasets: countryOrder.map(c => ({
+      label: c,
+      data: radarData[c],
+      borderColor: COLORS[c],
+      backgroundColor: COLORS[c] + '22',
+      pointStyle: MARKERS[c],
+      pointRadius: 5,
+      pointBackgroundColor: COLORS[c],
+      borderWidth: 2,
+      fill: true
+    }))
+  },
+  options: {
+    responsive: true,
+    scales: {
+      r: { min: 0, max: 1, ticks: { stepSize: 0.2, callback: v => v.toFixed(1) } }
+    },
+    plugins: {
+      tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.r) } },
+      legend: { labels: { usePointStyle: true } }
+    }
+  }
+});
+
+// ── 3. China vs India ──
+new Chart(document.getElementById('chinaIndia'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {
+        label: 'China (individuals)',
+        data: chinaPts,
+        backgroundColor: COLORS['China'] + '66',
+        borderColor: COLORS['China'] + '66',
+        pointStyle: 'circle',
+        pointRadius: 3.5,
+        borderWidth: 0
+      },
+      {
+        label: 'India (individuals)',
+        data: indiaPts,
+        backgroundColor: COLORS['India'] + '66',
+        borderColor: COLORS['India'] + '66',
+        pointStyle: 'rectRot',
+        pointRadius: 3.5,
+        borderWidth: 0
+      },
+      {
+        label: 'China (average)',
+        data: [chinaAvg],
+        backgroundColor: 'rgba(0,0,0,0)',
+        borderColor: COLORS['China'],
+        pointStyle: 'circle',
+        pointRadius: 12,
+        borderWidth: 3
+      },
+      {
+        label: 'India (average)',
+        data: [indiaAvg],
+        backgroundColor: 'rgba(0,0,0,0)',
+        borderColor: COLORS['India'],
+        pointStyle: 'rectRot',
+        pointRadius: 12,
+        borderWidth: 3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    aspectRatio: 1.3,
+    scales: {
+      x: { title: { display: true, text: 'Secular Values' }, min: 0, max: 1, ticks: { callback: v => v.toFixed(1) } },
+      y: { title: { display: true, text: 'Emancipative Values' }, min: 0, max: 1, ticks: { callback: v => v.toFixed(1) } }
+    },
+    plugins: {
+      tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': (' + fmt(ctx.parsed.x) + ', ' + fmt(ctx.parsed.y) + ')' } },
+      legend: { labels: { usePointStyle: true } }
+    }
+  }
+});
+</script>
+</body>
+</html>
